@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize'
 import { sequelize } from '../db/db'
+import Role from './Role'
 
 export const User = sequelize.define('users', {
     id: {
@@ -20,4 +21,19 @@ export const User = sequelize.define('users', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    status: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
+    },
+    rol: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: Role,
+            key: "id"
+        },
+    }
 })
+
+User.belongsTo(Role, { foreignKey: "rol" })
+Role.hasMany(User, { foreignKey: "rol" })

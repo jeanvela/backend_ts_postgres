@@ -4,9 +4,10 @@ import { hashPassword, comparePassword } from '../utils/password'
 import { createdToken } from '../utils/token'
 import { DataUser } from '../interfaces/dataUser'
 import { MyError } from '../interfaces/myError'
+import Role from '../models/Role'
 
 export const signUp = async (req: Request, res: Response) => {
-    const { name, email, password } = req.body
+    const { name, email, password, rol } = req.body
     try {
         const isEmail = await User.findOne({
             where: {
@@ -15,7 +16,7 @@ export const signUp = async (req: Request, res: Response) => {
         })
         if (isEmail) throw new Error("this email is already in use")
         const passwordHash = await hashPassword(password)
-        await User.create({name, email, password: passwordHash})
+        await User.create({name, email, password: passwordHash, rol})
         return res.status(201).json({message: "User created" })
     } catch (error) {
         const myError = error as MyError
@@ -29,18 +30,27 @@ export const signIn = async (req: Request, res: Response) => {
         let isUser = await User.findOne({
             where: {
                 email: email
-            }
+            },
+            include: [
+                {
+                    model: Role,
+                    attributes: ["id", "role"]
+                }
+            ]
         })
         if (!isUser) throw new Error("Invalid Email")
         const user: DataUser = isUser.get()
         const isMatch = await comparePassword(password, user.password)
         if (!isMatch) throw new Error("Invalid password")
-        const token = createdToken({id: user.id, name: user.name, email})
+        console.log(user.role.dataValues)
+        const token = createdToken({id: user.id, name: user.name, email, rol: user.role.dataValues})
         return res.status(200).set("Authorization", `Bearer ${token}`).json({
             id: user.id,
             name: user.name,
             email,
-            token
+            token,
+            status: user.status,
+            rol: user.role.dataValues
         })
     } catch (error) {
         const myError = error as MyError

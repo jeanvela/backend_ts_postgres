@@ -6,7 +6,8 @@ export function createdToken(user: Iuser) {
     return jwt.sign({
         id: user.id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        rol: user.rol
     }, jwtConfig.jwtSecret, {
         expiresIn: 86400
     })

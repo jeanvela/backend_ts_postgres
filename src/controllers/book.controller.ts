@@ -56,7 +56,7 @@ export const updateBook = async (req: Request, res: Response) => {
                 id: id
             }
         })
-        if (bookUpdate[0] === 0) throw new Error("Book not Update")
+        if (bookUpdate[0] === 0) throw new Error("Book not found")
         return res.status(204).json({message: "Updated success"})
     } catch (error) {
         const myError = error as MyError
