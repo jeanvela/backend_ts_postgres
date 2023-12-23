@@ -35,5 +35,6 @@ const Book = sequelize.define('books', {
 })
 
 Book.belongsTo(User, { foreignKey: "userId" })
+User.hasMany(Book, { foreignKey: "userId" })
 
 export default Book
